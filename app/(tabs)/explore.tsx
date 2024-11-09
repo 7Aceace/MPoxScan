@@ -5,10 +5,30 @@ import { Pressable, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function Explore(props) {
-  const { onPress1, title1 = 'Upload' } = props;
-  const { onPress2, title2 = 'Camera' } = props;
+  const { 
+    title2 = 'Camera' 
+  } = props;
   const [image, setImage] = useState<string | null>(null);
 
+  const openCamera = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      alert("You've refused to allow this app to access your camera!");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+  /* Upload fnction*/
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -33,9 +53,11 @@ export default function Explore(props) {
         source={require('../../assets/images/ImageUp.png')}
         style={styles.image}
       />
-      <Pressable style={styles.button} onPress={onPress2}>
+      
+      <Pressable style={styles.button} onPress={openCamera}>
         <Text style={styles.text}>{title2}</Text>
       </Pressable>
+
 
       <Pressable style={styles.button} onPress={pickImage}>
         <Text style={styles.text}>Upload</Text>
