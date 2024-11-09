@@ -1,4 +1,4 @@
-import { StatusBar, Text, Image } from 'react-native';
+import { StatusBar, Text, Image, View} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
@@ -45,24 +45,27 @@ export default function Explore(props) {
   };
 
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-green-400">
-      <Text className="text-2xl font-bold text-white"></Text>
+    <SafeAreaView className="flex-1 justify-center bg-white">
+     
+      
       <StatusBar style="light-content" />
-
+      <Text>Profile</Text> 
+     
       <Image
-        source={require('../../assets/images/ImageUp.png')}
+        source={require('../../assets/images/MpoxScanUp.png')}
         style={styles.image}
       />
-      
+      <View className='flex-1 flexDirection-row items-center padding-5 justify-center bg-green-400  rounded-tl-3xl rounded-tr-3xl'>
       <Pressable style={styles.button} onPress={openCamera}>
         <Text style={styles.text}>{title2}</Text>
       </Pressable>
 
 
-      <Pressable style={styles.button} onPress={pickImage}>
+      <Pressable  style={styles.button} onPress={pickImage}>
         <Text style={styles.text}>Upload</Text>
       </Pressable>
       {image && <Image source={{ uri: image }} style={styles.image} />}
+      </View>
     </SafeAreaView>
   );
 }
@@ -71,25 +74,21 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingVertical: 20,
-    paddingHorizontal: 60,
-    borderRadius: 2,
+    paddingVertical: 35,
+    paddingHorizontal: 150,
+    borderRadius: 5,
     elevation: 0.5,
-    backgroundColor: 'black',
-    marginVertical: 1,
+    backgroundColor: 'white',
+    marginVertical: 5,
   },
   text: {
     fontSize: 16,
     lineHeight: 21,
     fontWeight: 'bold',
     letterSpacing: 0.25,
-    color: 'white',
+    color: 'green',
   },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+
   image: {
     width: 400,
     height: 400,
