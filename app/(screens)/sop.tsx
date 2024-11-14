@@ -1,29 +1,24 @@
 import React from 'react';
+import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
-
-export default function AboutUs() {
+import { ScrollView } from 'react-native';
+export default function SOP() {
   const router = useRouter();
 
   return (
-  <SafeAreaView className="flex-1 items-center justify-center bg-green-400">
-      <View className="flex-row items-start justify-between px-5 pt-8 absolute top-0 w-full">
-        <View>
+    <SafeAreaView className="flex-1 bg-green-500">
+      <View className="flex-row items-start justify-between px-5 pt-8">
+        <Pressable onPress={() => router.back()}>
           <Text className="text-white text-xl">Back</Text>
-        </View>
+        </Pressable>
       </View>
-      <View className="absolute top-16 w-full">
-        <Text className="text-white text-5xl font-bold text-center">Result</Text>
+      <View className="p-5">
+        <Text className="text-2xl font-bold text-white">S.O.P.</Text>
+        {/* Add your SOP content here */}
       </View>
-
-      <View className="absolute top-40 w-full items-center justify-center">
-        <View className="w-60 h-60 bg-gray-300 rounded-full mt-4"></View>
-        <Text className="text-white text-3xl font-bold mt-8">Monkeypox</Text>
-      </View>
-
       <ScrollView 
-        className="absolute bottom-0 left-0 right-0 bg-white p-5 rounded-t-3xl h-[45%] pt-10"
+        className="absolute bottom-0 left-0 right-0 bg-white p-5 h-[70%] pt-10"
         style={{ flex: 1 }} 
         showsVerticalScrollIndicator={true}
         indicatorStyle="black"
@@ -37,14 +32,7 @@ export default function AboutUs() {
         "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat."
         </Text>
       </ScrollView>
-      <View className="absolute bottom-10 left-0 right-0 items-center">
-        <Pressable 
-          className="bg-green-500 rounded-full py-3 px-6" 
-          onPress={() => router.push("/(screens)/sop")}
-        >
-          <Text className="text-white text-lg font-bold">Standard Operating Procedure</Text>
-        </Pressable>
-      </View>
+      
     </SafeAreaView>
   );
 }
