@@ -20,7 +20,7 @@ export default function AboutUs() {
       </View>
 
       <ScrollView 
-        className="absolute bottom-0 left-0 right-0 bg-white p-5 rounded-t-3xl h-[50%] pt-10"
+        className="absolute bottom-0 left-0 right-0 bg-white p-5 rounded-t-3xl h-[45%] pt-10"
         style={{ flex: 1 }} 
         showsVerticalScrollIndicator={true}
         indicatorStyle="black"
