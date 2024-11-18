@@ -1,19 +1,18 @@
-import { NavigationContainer } from "@react-navigation/native"
-import "./global.css"
-import React from 'react'
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import AboutUsScreen from './app/(tabs)/aboutus';
+import ExploreScreen from './app/(tabs)/explore';
 
+const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
-  const Tab = createBottomTabNavigator();
   return (
     <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="Home" component={HomeScreen} />
-        
-      </Tab.Navigator>
+      <Stack.Navigator initialRouteName="Explore">
+        <Stack.Screen name="Explore" component={ExploreScreen} />
+        <Stack.Screen name="AboutUs" component={AboutUsScreen} />
+      </Stack.Navigator>
     </NavigationContainer>
-  )
+  );
 }
-
-

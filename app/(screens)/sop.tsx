@@ -9,7 +9,7 @@ export default function SOP() {
   return (
     <SafeAreaView className="flex-1 bg-green-500">
       <View className="flex-row items-start justify-between px-5 pt-8">
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={() => router.push("/(tabs)/aboutus")}>
           <Text className="text-white text-xl">Back</Text>
         </Pressable>
       </View>
