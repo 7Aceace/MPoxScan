@@ -16,44 +16,41 @@ export default function ExploreScreen() {
   const prepareImageForUpload = async (uri: string) => {
     setIsLoading(true);
     try {
-      // First, check if we can access the image file
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      
+      // Read the image file
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      const fileUri = fileInfo.uri;
+
+      // Prepare the form data
       const formData = new FormData();
       formData.append('file', {
-        uri: uri,
-        type: 'image/jpeg',
-        name: 'image.jpg',
+        uri: fileUri,
+        type: 'image/jpeg', // or 'image/png'
+        name: 'upload.jpg',
       } as any);
 
       console.log('Sending image to API...');
       console.log('Image URI:', uri);
-      
+
       // Add IP address validation
       const apiUrl = 'http://52.62.154.58:8000/ask';  // Added port 8000 explicitly
       console.log('Sending request to:', apiUrl);
 
       try {
-        const uploadResponse = await fetch(apiUrl, {
-          method: 'POST',
-          body: formData,
+        const response = await axios.post(apiUrl, formData, {
           headers: {
-            'Accept': '*/*',
+            'Content-Type': 'multipart/form-data',
           },
-          // Add timeout
-          timeout: 30000
+          timeout: 30000,
         });
 
-        console.log('Response status:', uploadResponse.status);
-        console.log('Response headers:', uploadResponse.headers);
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
 
-        if (!uploadResponse.ok) {
-          const errorText = await uploadResponse.text();
-          throw new Error(`HTTP error! status: ${uploadResponse.status}, body: ${errorText}`);
+        if (response.status !== 200) {
+          throw new Error(`HTTP error! status: ${response.status}, body: ${response.data}`);
         }
 
-        const data = await uploadResponse.json();
+        const data = response.data;
         console.log('API Response received:', data);
 
         if (data && data.prediction) {
@@ -61,8 +58,8 @@ export default function ExploreScreen() {
             pathname: '/(tabs)/aboutus',
             params: {
               prediction: data.prediction,
-              imageBase64: data.image
-            }
+              imageBase64: data.image,
+            },
           });
         }
 
@@ -86,7 +83,7 @@ export default function ExploreScreen() {
   const openCamera = async () => {
     try {
       const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-      
+
       if (permissionResult.granted === false) {
         alert("You've refused to allow this app to access your camera!");
         return;
