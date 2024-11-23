@@ -16,7 +16,7 @@ export default function TabLayout() {
           tabBarInactiveTintColor: '#ffffff',
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: '#4CAF50',
+            backgroundColor: '#5DB075',
             height: 56,
             paddingHorizontal: 16, // Add horizontal padding
             paddingVertical: 8,    // Adjust vertical padding
@@ -29,10 +29,10 @@ export default function TabLayout() {
           tabBarLabel: '',
           tabBarIcon: ({ focused }) => (
             <Image 
-              source={focused ? require('../../assets/buttons/Librarybutton_A.png') : require('../../assets/buttons/Librarybutton_NA.png')}
+              source={focused ? require('../../assets/icons/LibraryA.png') : require('../../assets/icons/LibraryN.png')}
               style={{ 
-                width: 50,       // Reduced size
-                height: 50,      // Reduced size
+                width: 30,       // Reduced size
+                height: 30,      // Reduced size
                 resizeMode: 'contain'  // Ensures the whole image is visible
               }}
             />
@@ -45,11 +45,12 @@ export default function TabLayout() {
           tabBarLabel: '',
           tabBarIcon: ({ focused }) => (
             <Image 
-              source={focused ? require('../../assets/buttons/Scanbutton_A.png') : require('../../assets/buttons/Scanbutton_NA.png')}
+              source={focused ? require('../../assets/icons/ScanA.png') : require('../../assets/icons/ScanN.png')}
               style={{ 
-                width: 50,       // Reduced size
-                height: 45,      // Reduced size
-                resizeMode: 'contain'  // Ensures the whole image is visible
+                width: 70,       // Reduced size
+                height: 70,      // Reduced size
+                resizeMode: 'contain',  // Ensures the whole image is visible
+                marginBottom: 75, // Adjust vertical position
               }}
             />
           ),
@@ -61,10 +62,10 @@ export default function TabLayout() {
           tabBarLabel: '',
           tabBarIcon: ({ focused }) => (
             <Image 
-              source={focused ? require('../../assets/buttons/HistoryButton_A.png') : require('../../assets/buttons/HistoryButton_NA.png')}
+              source={focused ? require('../../assets/icons/AboutUsA.png') : require('../../assets/icons/AboutUsN.png')}
               style={{ 
-                width: 50,       // Reduced size
-                height: 50,      // Reduced size
+                width: 30,       // Reduced size
+                height: 30,      // Reduced size
                 resizeMode: 'contain'  // Ensures the whole image is visible
               }}
             />
