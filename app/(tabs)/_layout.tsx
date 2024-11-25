@@ -1,74 +1,126 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Image } from 'react-native';
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { TabBar } from '../../components/TabBar';
+import { Image, View, Text, Dimensions } from 'react-native';
+
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  // Get screen dimensions
+  const screenWidth = Dimensions.get('window').width;
+  const screenHeight = Dimensions.get('window').height;
+
+  // Calculate proportional sizes
+  const tabBarHeight = screenHeight * 0.1; // 10% of screen height
+  const iconSize = screenWidth * 0.075; // 7.5% of screen width for regular icons
+  const centerIconSize = screenWidth * 0.2; // 20% of screen width for center icon
+  const labelFontSize = screenWidth * 0.03; // 3% of screen width for labels
 
   return (
     <Tabs
-        tabBar={props => <TabBar {...props} />}
-        screenOptions={{
-          tabBarActiveTintColor: '#ffffff',
-          tabBarInactiveTintColor: '#ffffff',
-          headerShown: false,
-          tabBarStyle: {
-            backgroundColor: '#5DB075',
-            height: 56,
-            paddingHorizontal: 16, // Add horizontal padding
-            paddingVertical: 8,    // Adjust vertical padding
-          }
-        }}
-      >
+      screenOptions={{
+        tabBarActiveTintColor: '#ffffff',
+        tabBarInactiveTintColor: '#ffffff',
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: '#5DB075',
+          height: tabBarHeight,
+          paddingBottom: tabBarHeight * 0.125, // 12.5% of tab bar height for padding
+        },
+        tabBarLabelStyle: {
+          fontSize: labelFontSize,
+          marginTop: -tabBarHeight * 0.0625, // 6.25% of tab bar height for margin
+        },
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="library"
         options={{
-          tabBarLabel: '',
+          tabBarLabel: 'Library',
+          tabBarLabelStyle: {
+            marginTop: tabBarHeight * 0.1875, // 18.75% of tab bar height
+          },
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#5DB075',
+          },
+          headerTintColor: '#FFFFFF',
+          headerTitleStyle: {
+            fontSize: labelFontSize * 1.67, // Larger than tab labels
+            fontFamily: 'Inter-SemiBold',
+          },
+          headerTitleAlign: 'center',
           tabBarIcon: ({ focused }) => (
-            <Image 
-              source={focused ? require('../../assets/icons/LibraryA.png') : require('../../assets/icons/LibraryN.png')}
-              style={{ 
-                width: 30,       // Reduced size
-                height: 30,      // Reduced size
-                resizeMode: 'contain'  // Ensures the whole image is visible
-              }}
-            />
+            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: tabBarHeight * 0.3125 }}>
+              <Image
+                source={
+                  focused
+                    ? require('../../assets/icons/LibraryA.png')
+                    : require('../../assets/icons/LibraryN.png')
+                }
+                style={{
+                  width: iconSize,
+                  height: iconSize,
+                  resizeMode: 'contain',
+                }}
+              />
+            </View>
           ),
         }}
       />
+
       <Tabs.Screen
         name="explore"
         options={{
           tabBarLabel: '',
           tabBarIcon: ({ focused }) => (
-            <Image 
-              source={focused ? require('../../assets/icons/ScanA.png') : require('../../assets/icons/ScanN.png')}
-              style={{ 
-                width: 70,       // Reduced size
-                height: 70,      // Reduced size
-                resizeMode: 'contain',  // Ensures the whole image is visible
-                marginBottom: 75, // Adjust vertical position
-              }}
-            />
+            <View style={{ alignItems: 'center', marginTop: -tabBarHeight * 0.5 }}>
+              <Image
+                source={
+                  focused
+                    ? require('../../assets/icons/ScanA.png')
+                    : require('../../assets/icons/ScanN.png')
+                }
+                style={{
+                  width: centerIconSize,
+                  height: centerIconSize,
+                  resizeMode: 'contain',
+                }}
+              />
+            </View>
           ),
         }}
       />
+
       <Tabs.Screen
         name="aboutus"
         options={{
-          tabBarLabel: '',
+          tabBarLabel: 'About Us',
+          tabBarLabelStyle: {
+            marginTop: tabBarHeight * 0.1875, // 18.75% of tab bar height
+          },
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#5DB075',
+          },
+          headerTintColor: '#FFFFFF',
+          headerTitleStyle: {
+            fontSize: labelFontSize * 1.67,
+            fontFamily: 'Inter-SemiBold',
+          },
+          headerTitleAlign: 'center',
           tabBarIcon: ({ focused }) => (
-            <Image 
-              source={focused ? require('../../assets/icons/AboutUsA.png') : require('../../assets/icons/AboutUsN.png')}
-              style={{ 
-                width: 30,       // Reduced size
-                height: 30,      // Reduced size
-                resizeMode: 'contain'  // Ensures the whole image is visible
-              }}
-            />
+            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: tabBarHeight * 0.3125 }}>
+              <Image
+                source={
+                  focused
+                    ? require('../../assets/icons/AboutUsA.png')
+                    : require('../../assets/icons/AboutUsN.png')
+                }
+                style={{
+                  width: iconSize,
+                  height: iconSize,
+                  resizeMode: 'contain',
+                }}
+              />
+            </View>
           ),
         }}
       />

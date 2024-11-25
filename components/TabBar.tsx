@@ -13,7 +13,10 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
 
   return (
-    <View style={styles.tabbar}>
+    <View 
+      style={styles.tabbar}
+      accessibilityRole="tab"
+    >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
@@ -47,7 +50,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         return (
           <PlatformPressable
             key={route.key}
-            accessibilityRole="button"
+            accessibilityRole="tab"
             accessibilityState={isFocused ? { selected: true } : {}}
             accessibilityLabel={options.tabBarAccessibilityLabel}
             testID={options.tabBarTestID}
