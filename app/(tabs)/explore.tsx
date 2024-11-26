@@ -1,17 +1,42 @@
-import { StatusBar, Text, Image, View, Alert } from 'react-native';
+import { StatusBar, Text, Image, View, Alert, StyleSheet, Dimensions, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Pressable } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';  // Add this new import
+import { MaterialIcons } from '@expo/vector-icons';  // Add this import
+
+const { width, height } = Dimensions.get('window');
 
 export default function ExploreScreen() {
   const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const title2 = 'Use Camera to upload an image';
+  const scanLineAnimation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    startScanAnimation();
+  }, []);
+
+  const startScanAnimation = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scanLineAnimation, {
+          toValue: 350, // This should match your image height
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scanLineAnimation, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
 
   const prepareImageForUpload = async (uri: string) => {
     setIsLoading(true);
@@ -82,82 +107,251 @@ export default function ExploreScreen() {
 
   const openCamera = async () => {
     try {
+      // Request camera permission
       const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
+      
       if (permissionResult.granted === false) {
-        alert("You've refused to allow this app to access your camera!");
+        Alert.alert("Permission Required", "You need to grant camera permission to use this feature.");
         return;
       }
 
+      // Launch camera
       const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
       });
 
-      console.log('Camera result:', result);
-
-      if (!result.canceled) {
+      if (!result.canceled && result.assets && result.assets[0]) {
         setImage(result.assets[0].uri);
         await prepareImageForUpload(result.assets[0].uri);
       }
     } catch (error) {
-      console.error('Error in openCamera:', error);
-      alert('Error accessing camera: ' + error.message);
+      console.error('Camera Error:', error);
+      Alert.alert('Error', 'Failed to open camera');
     }
   };
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    try {
+      // Launch image library
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      await prepareImageForUpload(result.assets[0].uri);
+      if (!result.canceled && result.assets && result.assets[0]) {
+        setImage(result.assets[0].uri);
+        await prepareImageForUpload(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Gallery Error:', error);
+      Alert.alert('Error', 'Failed to open gallery');
     }
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <View className="flex-row justify-between px-5 pt-2">
-        <Text className="text-green-500 text-lg">Profile</Text>
-        <Text className="text-green-500 text-lg">About Us</Text>
+      <View style={styles.header} />
+      
+      <View style={styles.buttonContainer}>
+        <Pressable 
+          style={styles.button} 
+          onPress={openCamera}
+          android_ripple={{ color: 'rgba(255, 255, 255, 0.2)' }}
+        >
+          <View style={styles.buttonContent}>
+            <MaterialIcons name="camera-alt" size={24} color="#FFFFFF" />
+            <Text style={styles.buttonText}>'Use Camera to upload an image'</Text>
+          </View>
+        </Pressable>
+        
+        <Pressable 
+          style={styles.button} 
+          onPress={pickImage}
+          android_ripple={{ color: 'rgba(255, 255, 255, 0.2)' }}
+        >
+          <View style={styles.buttonContent}>
+            <MaterialIcons name="photo-library" size={24} color="#FFFFFF" />
+            <Text style={styles.buttonText}>Upload an image from gallery</Text>
+          </View>
+          
+        </Pressable>
+
+        <Pressable 
+          style={styles.button} 
+          onPress={() => {
+            console.log('Navigating to /processing/review');
+            router.replace('/(processing)/review');
+          }}
+        >
+          <View style={styles.buttonContent}>
+            <Text style={styles.buttonText}>Review</Text>
+          </View>
+        </Pressable>
+
       </View>
-      <View className="flex-1 items-center justify-center px-10">
+
+      <View style={styles.imageContainer}>
         <Image
           source={require('../../assets/images/MpoxScanUp.png')}
-          className="w-[350px] h-[350px] self-center"
+          style={styles.mainImage}
         />
-      </View>
-      <View className="absolute top-[450px] w-full px-5">
-        <Text className="text-3xl text-center text-gray-700 font-bold">
-          Welcome to MpoxScan!
-        </Text>
-      </View>
-      <View className="absolute bottom-0 left-0 right-0 bg-green-500 p-5 rounded-t-3xl h-[40%] pt-10">
-        <Pressable className="bg-white rounded items-center py-9 px-10 mb-5" onPress={openCamera}>
-          <Text className="text-green-500 text-xl font-bold">{title2}</Text>
-        </Pressable>
-        <Pressable className="bg-white rounded items-center py-9 px-10 mb-5" onPress={pickImage}>
-          <Text className="text-green-500 text-xl font-bold">Upload an image from gallery</Text>
-        </Pressable>
-        {image && (
-          <Image 
-            source={{ uri: image }} 
-            className="w-96 h-96 mb-5 self-center"
+        <Animated.View
+          style={[
+            styles.scanLine,
+            {
+              transform: [{ translateY: scanLineAnimation }],
+              position: 'absolute',
+              top: 20,  // Match the marginTop of mainImage
+              zIndex: 1,  // Ensure it appears above the image
+            },
+          ]}
+          pointerEvents="none"
+        >
+          <LinearGradient
+            colors={['transparent', '#5DB075', 'transparent']}
+            style={styles.gradientLine}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            pointerEvents="none"
           />
-        )}
+        </Animated.View>
       </View>
+      
+      {image && (
+        <Image 
+          source={{ uri: image }} 
+          style={styles.uploadedImage}
+        />
+      )}
+      
       {isLoading && (
-        <View className="absolute inset-0 bg-black/50 items-center justify-center">
-          <Text className="text-white">Processing image...</Text>
+        <View style={styles.loadingOverlay}>
+          <Text style={styles.loadingText}>Processing image...</Text>
         </View>
       )}
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 8,
+  },
+  imageContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+    overflow: 'hidden',
+    position: 'relative',
+    zIndex: 0,
+  },
+  mainImage: {
+    width: 350,
+    height: 350,
+    alignSelf: 'center',
+    marginTop: 20,
+    position: 'absolute',
+    top: 0,
+    zIndex: 0,  // Ensure it's below the scanning line
+  },
+  titleContainer: {
+    position: 'absolute',
+    top: 50,
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  titleText: {
+    fontSize: 24,
+    textAlign: 'center',
+    color: '#374151',
+    fontWeight: 'bold',
+  },
+
+  buttonContainer: {
+    backgroundColor: '#FFFFFF', 
+    borderRadius: 25,
+    padding: 20,
+    width: '90%',
+    alignSelf: 'center',
+    marginBottom: 80,
+    gap: 10,  // Space between buttons
+    position: 'absolute',
+    bottom: 0,
+    zIndex: 2,
+  },
+  button: {
+    backgroundColor: '#5DB075',
+    borderRadius: 24,
+    minHeight: height * 0.06,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 15,  // Add padding for icon
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,  // Space between icon and text
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    flex: 1,  // This helps with text wrapping
+  },
+  uploadedImage: {
+    width: 384,
+    height: 384,
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    color: 'white',
+  },
+  scanLine: {
+    position: 'absolute',
+    width: 600,  // Match the image width
+    height: 4,
+    backgroundColor: '#5DB075',
+    opacity: 1,
+    shadowColor: '#5DB075',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 5,
+    zIndex: 1,
+    pointerEvents: 'none',
+  },
+  gradientLine: {
+    width: '100%',
+    height: '100%',
+  },
+});

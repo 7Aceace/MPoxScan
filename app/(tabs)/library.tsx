@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Text, Image, ScrollView, Pressable, Dimensions } from 'react-native';
+import { useRouter } from 'expo-router';  
+import { skinLesionData } from '../data/skinLesionData'
 
 const Library = () => {
   const [selectedTab, setSelectedTab] = useState<number>(0);
+  const router = useRouter();
 
   const buttons = [
     { title: 'Skin Lesions' },
@@ -12,7 +15,6 @@ const Library = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        
         {/* Custom Tab Button */}
         <View style={styles.tabContainer}>
           {buttons.map((button, index) => {
@@ -38,162 +40,244 @@ const Library = () => {
         </View>
       </View>
 
-      <ScrollView 
-        style={styles.scrollView}
-        contentContainerStyle={[
-          styles.scrollViewContent,
-          { minHeight: Dimensions.get('window').height + 1 }
-        ]}
-        showsVerticalScrollIndicator={false}
-      >
-        {selectedTab === 0 ? (
-          <>
-            {/* First Row */}
-            <View style={styles.row}>
-              <View style={styles.card}>
+      {selectedTab === 0 ? (
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={[
+            styles.scrollViewContent,
+            { minHeight: Dimensions.get('window').height + 1 }
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* First Row */}
+          <View style={styles.row}>
+            <View style={styles.card}>
+              <Pressable 
+                onPress={() => {
+                  console.log('Pressing monkeypox');
+                  router.push({
+                    pathname: "/(screens)/skinlesion",
+                    params: { id: 'monkeypox' }
+                  });
+                }}
+              >
                 <Image
                   source={require('../../assets/images/monkeypox.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>Monkeypox</Text>
-              </View>
+              </Pressable>
+            </View>
 
-              <View style={[styles.card, styles.cardRight]}>
+            <View style={[styles.card, styles.cardRight]}>
+              <Pressable 
+                onPress={() => {
+                  console.log('Pressing actinic');
+                  router.push({
+                    pathname: "/(screens)/skinlesion",
+                    params: { id: 'actinicKeratosis' }
+                  });
+                }}
+              >
                 <Image
                   source={require('../../assets/images/actinickeratosis.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>Actinic Keratosis</Text>
-              </View>
+              </Pressable>
             </View>
+          </View>
 
-            {/* Second Row */}
-            <View style={styles.row}>
-              <View style={styles.card}>
+          {/* Second Row */}
+          <View style={styles.row}>
+            <View style={styles.card}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "basalcellcarcinoma" }
+              })}>
                 <Image
                   source={require('../../assets/images/basal.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
-                <Text style={[styles.cardText, { fontSize: 12 }]}>Basal Cell Carcinoma</Text>
-              </View>
+                <Text style={styles.cardText}>Basal Cell Carcinoma</Text>
+              </Pressable>
+            </View>
 
-              <View style={[styles.card, styles.cardRight]}>
+            <View style={[styles.card, styles.cardRight]}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "benign" }
+              })}>
                 <Image
                   source={require('../../assets/images/benign.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>Benign Keratosis</Text>
-              </View>
+              </Pressable>
             </View>
+          </View>
 
-            {/* Third Row */}
-            <View style={styles.row}>
-              <View style={styles.card}>
+          {/* Third Row */}
+          <View style={styles.row}>
+            <View style={styles.card}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "chickenpox" }
+              })}>
                 <Image
                   source={require('../../assets/images/chickenpox.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>Chickenpox</Text>
-              </View>
+              </Pressable>
+            </View>
 
-              <View style={[styles.card, styles.cardRight]}>
+            <View style={[styles.card, styles.cardRight]}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "cowpox" }
+              })}>
                 <Image
                   source={require('../../assets/images/cowpox.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>Cowpox</Text>
-              </View>
+              </Pressable>
             </View>
+          </View>
 
-            {/* Fourth Row */}
-            <View style={styles.row}>
-              <View style={styles.card}>
+          {/* Fourth Row */}
+          <View style={styles.row}>
+            <View style={styles.card}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "dermatofibroma" }
+              })}>
                 <Image
                   source={require('../../assets/images/derma.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>Dermatofibroma</Text>
-              </View>
+              </Pressable>
+            </View>
 
-              <View style={[styles.card, styles.cardRight]}>
+            <View style={[styles.card, styles.cardRight]}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "hfmd" }
+              })}>
                 <Image
                   source={require('../../assets/images/hfmd.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>HFMD</Text>
-              </View>
+              </Pressable>
             </View>
+          </View>
 
-            {/* Fifth Row */}
-            <View style={styles.row}>
-              <View style={styles.card}>
+          {/* Fifth Row */}
+          <View style={styles.row}>
+            <View style={styles.card}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "measles" }
+              })}>
                 <Image
                   source={require('../../assets/images/measles.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>Measles</Text>
-              </View>
+              </Pressable>
+            </View>
 
-              <View style={[styles.card, styles.cardRight]}>
+            <View style={[styles.card, styles.cardRight]}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "melanocyticNevus" }
+              })}>
                 <Image
                   source={require('../../assets/images/melanocytic.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>Melonocytic Nevus</Text>
-              </View>
+              </Pressable>
             </View>
+          </View>
 
-            {/* Sixth Row */}
-            <View style={styles.row}>
-              <View style={styles.card}>
+          {/* Sixth Row */}
+          <View style={styles.row}>
+            <View style={styles.card}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "melanoma" }
+              })}>
                 <Image
                   source={require('../../assets/images/melanoma.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>Melanoma</Text>
-              </View>
+              </Pressable>
+            </View>
 
-              <View style={[styles.card, styles.cardRight]}>
+            <View style={[styles.card, styles.cardRight]}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "squamousCellCarcinoma" }
+              })}>
                 <Image
                   source={require('../../assets/images/squamous.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={[styles.cardText, { fontSize: 10 }]}>Squamous Cell Carcinoma</Text>
-              </View>
+              </Pressable>
             </View>
+          </View>
 
-            {/* Seventh Row */}
-            <View style={styles.row}>
-              <View style={[styles.card, styles.cardLeft]}>
+          {/* Seventh Row */}
+          <View style={styles.row}>
+            <View style={[styles.card, styles.cardLeft]}>
+              <Pressable onPress={() => router.push({
+                pathname: "/(screens)/skinlesion",
+                params: { id: "vascularLesion" }
+              })}>
                 <Image
                   source={require('../../assets/images/vascular.jpg')}
                   style={styles.image}
                   resizeMode="cover"
                 />
                 <Text style={styles.cardText}>Vascular Lesion</Text>
-              </View>
-
+              </Pressable>
             </View>
-          </>
+          </View>
+        </ScrollView>
+      ) : (
 
-
-
-
-        ) : (
+        
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollViewContent}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.protocolsContainer}>
-            <View style={styles.protocolContainer}>
+            <Pressable 
+              onPress={() => router.push({
+                pathname: "/(screens)/safetyprotocols",
+                params: { id: "infected" }
+              })}
+              style={styles.protocolContainer}
+            >
               <Image
                 source={require('../../assets/images/infected.png')}
                 style={styles.protocolImage}
@@ -205,10 +289,19 @@ const Library = () => {
                   What should you do when you are infected with the virus.
                 </Text>
               </View>
-            </View>
+            </Pressable>
 
-            {/* Second Row*/}
-            <View style={styles.protocolContainer}>
+            {/* Second Row */}
+            <Pressable 
+              onPress={() => {
+                console.log('Pressing signs protocol');
+                router.push({
+                  pathname: "/(screens)/safetyprotocols",
+                  params: { id: "signs" }
+                });
+              }}
+              style={styles.protocolContainer}
+            >
               <Image
                 source={require('../../assets/images/signs.png')}
                 style={styles.protocolImage}
@@ -220,44 +313,52 @@ const Library = () => {
                   What are the signs that you are likely to be infected?
                 </Text>
               </View>
-            </View>
+            </Pressable>
 
-            {/* Third Row*/}
-            <View style={styles.protocolContainer}>
-              <Image
-                source={require('../../assets/images/symptoms.png')}
-                style={styles.protocolImage}
-                resizeMode="contain"
-              />
-              <View style={styles.protocolTextContainer}>
-                <Text style={styles.protocolTitle}>Common Symptoms</Text>
-                <Text style={styles.protocolDescription}>
-                  Have you got these symptoms?
-                </Text>
-              </View>
-            </View>
+          {/* Third Protocol */}
+          <Pressable 
+                onPress={() => router.push({
+                  pathname: "/(screens)/safetyprotocols",
+                  params: { id: "symptoms" }
+                })}
+                style={styles.protocolContainer}
+              >
+                <Image
+                  source={require('../../assets/images/symptoms.png')}
+                  style={styles.protocolImage}
+                  resizeMode="contain"
+                />
+                <View style={styles.protocolTextContainer}>
+                  <Text style={styles.protocolTitle}>Common Symptoms</Text>
+                  <Text style={styles.protocolDescription}>
+                    Have you got these symptoms?
+                  </Text>
+                </View>
+              </Pressable>
 
-            {/* Fourth Row*/}
-            <View style={styles.protocolContainer}>
-              <Image
-                source={require('../../assets/images/isolation.png')}
-                style={styles.protocolImage}
-                resizeMode="contain"
-              />
-              <View style={styles.protocolTextContainer}>
-                <Text style={styles.protocolTitle}>Self Isolation 101</Text>
-                <Text style={styles.protocolDescription}>
-                  Quarantine again? It's already 2024.
-                </Text>
-              </View>
-            </View>
-            
-            
-
-
+              {/* Fourth Protocol */}
+              <Pressable 
+                onPress={() => router.push({
+                  pathname: "/(screens)/safetyprotocols",
+                  params: { id: "isolation" }
+                })}
+                style={styles.protocolContainer}
+              >
+                <Image
+                  source={require('../../assets/images/isolation.png')}
+                  style={styles.protocolImage}
+                  resizeMode="contain"
+                />
+                <View style={styles.protocolTextContainer}>
+                  <Text style={styles.protocolTitle}>Self Isolation 101</Text>
+                  <Text style={styles.protocolDescription}>
+                    Quarantine again? It's already 2024.
+                  </Text>
+                </View>
+              </Pressable>
           </View>
-        )}
-      </ScrollView>
+        </ScrollView>
+      )}
     </View>
   );
 };

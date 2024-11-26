@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Image, View, Text, Dimensions } from 'react-native';
+import { Image, View, Text, Dimensions, TouchableWithoutFeedback } from 'react-native';
 
 export default function TabLayout() {
   // Get screen dimensions
@@ -48,7 +48,7 @@ export default function TabLayout() {
           },
           headerTitleAlign: 'center',
           tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: tabBarHeight * 0.3125 }}>
+            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: tabBarHeight * 0.3125, alignSelf: 'center' }}>
               <Image
                 source={
                   focused
@@ -63,6 +63,11 @@ export default function TabLayout() {
               />
             </View>
           ),
+          tabBarButton: (props) => (
+            <TouchableWithoutFeedback onPress={props.onPress}>
+              <View style={{ flex: 1, alignItems: 'center' }}>{props.children}</View>
+            </TouchableWithoutFeedback>
+          )
         }}
       />
 
@@ -71,7 +76,7 @@ export default function TabLayout() {
         options={{
           tabBarLabel: '',
           tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center', marginTop: -tabBarHeight * 0.5 }}>
+            <View style={{ alignItems: 'center', marginTop: -tabBarHeight * 0.3125 }}>
               <Image
                 source={
                   focused
@@ -86,6 +91,11 @@ export default function TabLayout() {
               />
             </View>
           ),
+          tabBarButton: (props) => (
+            <TouchableWithoutFeedback onPress={props.onPress}>
+              <View style={{ flex: 1, alignItems: 'center' }}>{props.children}</View>
+            </TouchableWithoutFeedback>
+          )
         }}
       />
 
@@ -122,6 +132,11 @@ export default function TabLayout() {
               />
             </View>
           ),
+          tabBarButton: (props) => (
+            <TouchableWithoutFeedback onPress={props.onPress}>
+              <View style={{ flex: 1, alignItems: 'center' }}>{props.children}</View>
+            </TouchableWithoutFeedback>
+          ) 
         }}
       />
     </Tabs>
