@@ -111,7 +111,7 @@ const Symptoms = () => {
             <View style={styles.buttonContainer}>
                 <Pressable
                     style={[styles.button, styles.continueButton]}
-                    onPress={() => {}}>
+                    onPress={() => router.push('/(processing)/analysis')}>
                     <Text style={styles.continueText}>Continue</Text>
                 </Pressable>
             </View>
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     padding: 20,
     width: '90%',
     alignSelf: 'center',
-    marginBottom: 0,
+    marginBottom: 10,
     gap: 10,
     position: 'absolute',
     bottom: 0,
