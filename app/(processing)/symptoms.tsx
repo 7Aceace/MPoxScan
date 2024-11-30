@@ -16,6 +16,32 @@ const symptomsData = [
 
 const Symptoms = () => {
   const router = useRouter();
+  const [checkedSymptoms, setCheckedSymptoms] = React.useState(new Set());
+
+  const handleSymptomPress = (symptomId: string) => {
+    setCheckedSymptoms(prev => {
+      const newChecked = new Set(prev);
+      if (symptomId === 'none') {
+        // If "None" is selected, clear all other selections
+        if (!newChecked.has('none')) {
+          newChecked.clear();
+          newChecked.add('none');
+        } else {
+          newChecked.delete('none');
+        }
+      } else {
+        // If another symptom is selected, remove "None" and toggle the symptom
+        newChecked.delete('none');
+        if (newChecked.has(symptomId)) {
+          newChecked.delete(symptomId);
+        } else {
+          newChecked.add(symptomId);
+        }
+      }
+      return newChecked;
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen
@@ -49,69 +75,46 @@ const Symptoms = () => {
       >
            
             <View style={styles.checkboxContainer}>
-            {(() => {
-                const [checkedSymptoms, setCheckedSymptoms] = React.useState(new Set());
-                
-                const handleSymptomPress = (symptomId: string) => {
-                    setCheckedSymptoms(prev => {
-                        const newChecked = new Set(prev);
-                        if (symptomId === 'none') {
-                            // If "None" is selected, clear all other selections
-                            if (!newChecked.has('none')) {
-                                newChecked.clear();
-                                newChecked.add('none');
-                            } else {
-                                newChecked.delete('none');
-                            }
-                        } else {
-                            // If another symptom is selected, remove "None" and toggle the symptom
-                            newChecked.delete('none');
-                            if (newChecked.has(symptomId)) {
-                                newChecked.delete(symptomId);
-                            } else {
-                                newChecked.add(symptomId);
-                            }
-                        }
-                        return newChecked;
-                    });
-                };
-
-                return symptomsData.map((symptom) => {
-                    const isChecked = checkedSymptoms.has(symptom.id);
-                    const isDisabled = symptom.id !== 'none' && checkedSymptoms.has('none');
-                    
-                    return (
-                        <Pressable 
-                            key={symptom.id} 
-                            style={[
-                                styles.checkboxItem,
-                                isDisabled && { opacity: 0.5 }
-                            ]}
-                            onPress={() => !isDisabled && handleSymptomPress(symptom.id)}
-                        >
-                            <Image source={symptom.icon} style={styles.checkboxImage} />
-                            <View style={styles.checkboxTextContainer}>
-                                <Text style={styles.checkboxLabel}>{symptom.label}</Text>
-                                <Text style={styles.checkboxDescription}>{symptom.description}</Text>
-                            </View>
-                            <Checkbox
-                                style={styles.checkbox}
-                                value={isChecked}
-                                onValueChange={() => !isDisabled && handleSymptomPress(symptom.id)}
-                                color={'#5DB075'}
-                                disabled={isDisabled}
-                            />
-                        </Pressable>
-                    );
-                });
-            })()}
+            {symptomsData.map((symptom) => {
+              const isChecked = checkedSymptoms.has(symptom.id);
+              const isDisabled = symptom.id !== 'none' && checkedSymptoms.has('none');
+              
+              return (
+                <Pressable 
+                  key={symptom.id} 
+                  style={[
+                    styles.checkboxItem,
+                    isDisabled && { opacity: 0.5 }
+                  ]}
+                  onPress={() => !isDisabled && handleSymptomPress(symptom.id)}
+                >
+                  <Image source={symptom.icon} style={styles.checkboxImage} />
+                  <View style={styles.checkboxTextContainer}>
+                    <Text style={styles.checkboxLabel}>{symptom.label}</Text>
+                    <Text style={styles.checkboxDescription}>{symptom.description}</Text>
+                  </View>
+                  <Checkbox
+                    style={styles.checkbox}
+                    value={isChecked}
+                    onValueChange={() => !isDisabled && handleSymptomPress(symptom.id)}
+                    color={'#5DB075'}
+                    disabled={isDisabled}
+                  />
+                </Pressable>
+              );
+            })}
             </View>
 
         </ScrollView>
             <View style={styles.buttonContainer}>
                 <Pressable
-                    style={[styles.button, styles.continueButton]}
-                    onPress={() => router.push('/(processing)/analysis')}>
+                    style={[
+                        styles.button, 
+                        styles.continueButton,
+                        checkedSymptoms.size === 0 && styles.buttonDisabled
+                    ]}
+                    onPress={() => router.push('/(processing)/analysis')}
+                    disabled={checkedSymptoms.size === 0}>
                     <Text style={styles.continueText}>Continue</Text>
                 </Pressable>
             </View>
@@ -205,6 +208,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 2,
     borderColor: '#5DB075',
+  },
+  buttonDisabled: {
+    backgroundColor: '#9CA3AF', // Gray color when disabled
+    opacity: 0.5,
   },
 });
 
