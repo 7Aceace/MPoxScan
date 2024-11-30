@@ -80,7 +80,7 @@ export default function ExploreScreen() {
 
         if (data && data.prediction) {
           router.push({
-            pathname: '/(tabs)/aboutus',
+            pathname: '/(results)/results',
             params: {
               prediction: data.prediction,
               imageBase64: data.image,
@@ -117,7 +117,7 @@ export default function ExploreScreen() {
 
       // Launch camera
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
@@ -137,7 +137,7 @@ export default function ExploreScreen() {
     try {
       // Launch image library
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
