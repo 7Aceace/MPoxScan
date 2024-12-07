@@ -60,7 +60,7 @@ export default function ExploreScreen() {
         name: 'upload.jpg',
       } as any);
 
-      const response = await axios.post('http://52.62.154.58:8000/ask', formData, {
+      const response = await axios.post('https://ace7s-mpoxscan.hf.space/ask', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
