@@ -21,6 +21,12 @@ export default function ExploreScreen() {
     startScanAnimation();
   }, []);
 
+  useEffect(() => {
+    if (isLoading) {
+      router.replace('/(processing)/analysis');
+    }
+  }, [isLoading]);
+
   const startScanAnimation = () => {
     Animated.loop(
       Animated.sequence([
@@ -40,68 +46,41 @@ export default function ExploreScreen() {
 
   const prepareImageForUpload = async (uri: string) => {
     setIsLoading(true);
+    
     try {
-      // Read the image file
-      const fileInfo = await FileSystem.getInfoAsync(uri);
-      const fileUri = fileInfo.uri;
+      // Navigate to analysis screen first
+      router.replace('/(processing)/analysis');
 
-      // Prepare the form data
+      // Prepare and send the image
+      const fileInfo = await FileSystem.getInfoAsync(uri);
       const formData = new FormData();
       formData.append('file', {
-        uri: fileUri,
-        type: 'image/jpeg', // or 'image/png'
+        uri: fileInfo.uri,
+        type: 'image/jpeg',
         name: 'upload.jpg',
       } as any);
 
-      console.log('Sending image to API...');
-      console.log('Image URI:', uri);
+      const response = await axios.post('http://52.62.154.58:8000/ask', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 30000,
+      });
 
-      // Add IP address validation
-      const apiUrl = 'http://52.62.154.58:8000/ask';  // Added port 8000 explicitly
-      console.log('Sending request to:', apiUrl);
-
-      try {
-        const response = await axios.post(apiUrl, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          timeout: 30000,
-        });
-
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-
-        if (response.status !== 200) {
-          throw new Error(`HTTP error! status: ${response.status}, body: ${response.data}`);
-        }
-
-        const data = response.data;
-        console.log('API Response received:', data);
-
-        if (data && data.prediction) {
-          router.push({
-            pathname: '/(results)/results',
-            params: {
-              prediction: data.prediction,
-              imageBase64: data.image,
-            },
-          });
-        }
-
-      } catch (fetchError) {
-        console.error('Fetch error details:', {
-          message: fetchError.message,
-          type: fetchError.type,
-          code: fetchError.code,
-        });
-        throw new Error(`API request failed: ${fetchError.message}`);
+      if (response.status === 200 && response.data) {
+        global.analysisResults = {
+          prediction: response.data.prediction,
+          imageBase64: response.data.image,
+          confidence: response.data.confidence,
+        };
+      } else {
+        throw new Error('Invalid response from server');
       }
 
     } catch (error) {
-      console.error('Upload error:', error);
-      alert(`Error uploading image: ${error.message}\nPlease check your internet connection and try again.`);
-    } finally {
-      setIsLoading(false);
+      console.error('Error:', error);
+      Alert.alert('Error', 'Failed to process image');
+      router.back();
     }
   };
 
@@ -166,7 +145,7 @@ export default function ExploreScreen() {
         >
           <View style={styles.buttonContent}>
             <MaterialIcons name="camera-alt" size={24} color="#FFFFFF" />
-            <Text style={styles.buttonText}>'Use Camera to upload an image'</Text>
+            <Text style={styles.buttonText}>Use Camera to upload an image</Text>
           </View>
         </Pressable>
         
@@ -180,18 +159,6 @@ export default function ExploreScreen() {
             <Text style={styles.buttonText}>Upload an image from gallery</Text>
           </View>
           
-        </Pressable>
-
-        <Pressable 
-          style={styles.button} 
-          onPress={() => {
-            console.log('Navigating to /processing/review');
-            router.replace('/(processing)/review');
-          }}
-        >
-          <View style={styles.buttonContent}>
-            <Text style={styles.buttonText}>Review</Text>
-          </View>
         </Pressable>
 
       </View>
@@ -223,18 +190,7 @@ export default function ExploreScreen() {
         </Animated.View>
       </View>
       
-      {image && (
-        <Image 
-          source={{ uri: image }} 
-          style={styles.uploadedImage}
-        />
-      )}
-      
-      {isLoading && (
-        <View style={styles.loadingOverlay}>
-          <Text style={styles.loadingText}>Processing image...</Text>
-        </View>
-      )}
+      {isLoading && (() => router.push('/(processing)/analysis'))()}
     </SafeAreaView>
   );
 }
@@ -314,12 +270,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flex: 1,  // This helps with text wrapping
   },
-  uploadedImage: {
-    width: 384,
-    height: 384,
-    marginBottom: 20,
-    alignSelf: 'center',
-  },
+ 
   loadingOverlay: {
     position: 'absolute',
     top: 0,

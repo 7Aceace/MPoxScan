@@ -1,121 +1,165 @@
-import React from "react";
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Image, Dimensions, Pressable } from "react-native";
-import { Stack, useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { 
+  SafeAreaView, 
+  StatusBar, 
+  View, 
+  Text, 
+  StyleSheet, 
+  Dimensions, 
+  Pressable, 
+  Alert, 
+  Animated, 
+  Image 
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
-const Review = () => {
+export default function ExploreScreen() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const scanLineAnimation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    startScanAnimation();
+  }, []);
+
+  const startScanAnimation = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scanLineAnimation, {
+          toValue: 350,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scanLineAnimation, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
+
+  const handleImageSelection = async (uri: string, source: 'camera' | 'gallery') => {
+    try {
+      router.push({
+        pathname: '/(processing)/review',
+        params: { imageUri: uri, source },
+      });
+    } catch (error) {
+      console.error('Navigation Error:', error);
+      Alert.alert('Error', 'Failed to navigate to review screen.');
+    }
+  };
+
+  const openCamera = async () => {
+    const { granted } = await ImagePicker.requestCameraPermissionsAsync();
+    if (!granted) {
+      Alert.alert('Permission Required', 'Camera access is needed to take a photo.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets && result.assets[0]) {
+      handleImageSelection(result.assets[0].uri, 'camera');
+    }
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets && result.assets[0]) {
+      handleImageSelection(result.assets[0].uri, 'gallery');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen 
-        options={{
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: '#5DB075',
-          },
-          headerTintColor: '#fff',
-          headerTitle: 'Review',
-          headerTitleAlign: 'center',
-          headerLeft: () => null,
-          headerBackVisible: false,
-        }}
-      />
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.imageContainer}>
-          <Image
-            source={require('../../assets/images/monkeypox.jpg')}
-            style={styles.image}
-            resizeMode="cover"
+      <StatusBar barStyle="light-content" />
+      <View style={styles.imageContainer}>
+        <Image
+          source={require('../../assets/images/MpoxScanUp.png')}
+          style={styles.mainImage}
+        />
+        <Animated.View
+          style={[
+            styles.scanLine,
+            { transform: [{ translateY: scanLineAnimation }] },
+          ]}
+        >
+          <LinearGradient
+            colors={['transparent', '#5DB075', 'transparent']}
+            style={styles.gradientLine}
           />
-        </View>
-        <Text style={styles.instructions}>
-          Make sure the photo is <Text style={styles.boldText}>sharp</Text>,{' '}
-          <Text style={styles.boldText}>centered</Text> and{' '}
-          <Text style={styles.boldText}>free from obstructing objects</Text>.
-        </Text>
-        <View style={styles.buttonContainer}>
-          <Pressable 
-            style={[styles.button, styles.retakeButton]} 
-            onPress={() => router.replace('')}>
-            <Text style={styles.retakeText}>Retake</Text>
-          </Pressable>
-          <Pressable 
-            style={[styles.button, styles.continueButton]} 
-            onPress={() => router.replace('/(processing)/symptoms')}>
-            <Text style={styles.continueText}>Continue</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
+        </Animated.View>
+      </View>
+      <View style={styles.buttonContainer}>
+        <Pressable style={styles.button} onPress={openCamera}>
+          <MaterialIcons name="camera-alt" size={24} color="#FFFFFF" />
+          <Text style={styles.buttonText}>Take a Photo</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={pickImage}>
+          <MaterialIcons name="photo-library" size={24} color="#FFFFFF" />
+          <Text style={styles.buttonText}>Upload from Gallery</Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
   },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-  },
   imageContainer: {
-    width: width,
-    height: height * 0.4,
-    overflow: 'hidden',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  instructions: {
-    fontSize: 18,
-    textAlign: 'center',
-    color: '#374151',
-    marginTop: 20,
-    lineHeight: 22,
-    paddingHorizontal: 20,
-  },
-  boldText: {
-    fontWeight: 'bold',
-  },
-  buttonContainer: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 25,
-    width: '90%',
-    alignSelf: 'center',
-    marginBottom: 10,
-    gap: 10,
-    position: 'absolute',
-    bottom: 0,
-    zIndex: 2,
-  },
-  button: {
-    backgroundColor: '#5DB075',
-    borderRadius: 24,
-    minHeight: height * 0.06,
-    width: '100%',
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  retakeButton: {
-    backgroundColor: '#E5E5E5',
+  mainImage: {
+    width: 300,
+    height: 300,
   },
-  continueButton: {
+  scanLine: {
+    position: 'absolute',
+    width: '100%',
+    height: 4,
     backgroundColor: '#5DB075',
   },
-  retakeText: {
-    color: '#6B7280',
-    fontWeight: '600',
-    fontSize: 16,
+  gradientLine: {
+    height: '100%',
+    width: '100%',
   },
-  continueText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 16,
+  buttonContainer: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#5DB075',
+    padding: 15,
+    borderRadius: 8,
+    marginVertical: 10,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    marginLeft: 10,
   },
 });
-
-export default Review;

@@ -5,53 +5,87 @@ import Animated, {
   Easing, 
   useSharedValue, 
   useAnimatedStyle, 
-  withTiming,
-  runOnJS,
+  withTiming, 
+  withRepeat 
 } from 'react-native-reanimated';
+
+// Add this type declaration
+declare global {
+  var analysisResults: {
+    prediction: string;
+    imageBase64: string;
+  } | null;
+}
 
 const { width } = Dimensions.get('window');
 
 const Analysis = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
-  const progress = useSharedValue(0);
+  const pulse = useSharedValue(1); // Controls the scale of the pulse
+  const opacity = useSharedValue(1); // Controls the opacity of the pulse
   const [isComplete, setIsComplete] = useState(false);
 
-  // Handle completion and navigation
-  const handleCompletion = () => {
-    setIsComplete(true);
-    // Add a small delay before navigation
-    setTimeout(() => {
-      router.push('/(results)/results');
-    }, 500); // 500ms delay after animation completes
-  };
-
-  // Circle animation that completes one rotation
+  // Wait for API results
   useEffect(() => {
-    progress.value = withTiming(1, {
-      duration: 3000,
-      easing: Easing.linear,
-    }, (finished) => {
-      if (finished) {
-        runOnJS(handleCompletion)();
+    const checkResults = setInterval(() => {
+      if (global.analysisResults) {
+        clearInterval(checkResults);
+        setIsComplete(true);
+        router.push({
+          pathname: '/(results)/results',
+          params: {
+            prediction: global.analysisResults.prediction,
+            imageBase64: global.analysisResults.imageBase64,
+          },
+        });
+        global.analysisResults = null;
       }
+    }, 100);
+
+    return () => clearInterval(checkResults);
+  }, []);
+
+  // Pulse animation
+  useEffect(() => {
+    pulse.value = withRepeat(
+      withTiming(1.2, {
+        duration: 1000,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      -1, // Infinite repeat
+      true // Reverse the animation
+    );
+
+    opacity.value = withRepeat(
+      withTiming(0, {
+        duration: 1000,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      -1,
+      true
+    );
+  }, []);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulse.value }],
+    opacity: opacity.value,
+  }));
+
+  // Steps animation
+  useEffect(() => {
+    const steps = [
+      { delay: 1000, step: 1 },
+      { delay: 2000, step: 2 },
+      { delay: 3000, step: 3 },
+    ];
+
+    steps.forEach(({ delay, step }) => {
+      setTimeout(() => {
+        setCurrentStep(step);
+      }, delay);
     });
   }, []);
-
-  // Sequentially showing bullet points
-  useEffect(() => {
-    const intervals = [
-      setTimeout(() => setCurrentStep(1), 1000),
-      setTimeout(() => setCurrentStep(2), 2000),
-      setTimeout(() => setCurrentStep(3), 3000),
-    ];
-    return () => intervals.forEach(clearTimeout);
-  }, []);
-
-  // Animated circle style
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${progress.value * 360}deg` }],
-  }));
 
   return (
     <SafeAreaView style={styles.container}>
@@ -65,17 +99,13 @@ const Analysis = () => {
           headerTitle: 'Analyzing',
           headerTitleAlign: 'center',
           headerLeft: () => null,
-          headerBackVisible: true,
+          headerBackVisible: false,
         }}
       />
       <View style={styles.circleContainer}>
-        <Animated.View 
-          style={[
-            styles.circle, 
-            animatedStyle,
-            isComplete && styles.completeCircle
-          ]} 
-        />
+        <View style={styles.baseCircle}>
+          <Animated.View style={[styles.pulseCircle, pulseStyle]} />
+        </View>
       </View>
 
       <View style={styles.content}>
@@ -100,19 +130,23 @@ const styles = StyleSheet.create({
   circleContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 40,
+    marginTop: 20,
   },
-  circle: {
-    width: width * 0.7,
-    height: width * 0.7,
-    borderRadius: width * 0.35,
-    borderWidth: 5,
-    borderColor: 'white',
-    borderTopColor: '#5DB075',
+  baseCircle: {
+    width: 180,
+    height: 180,
+    borderRadius: 100,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  completeCircle: {
-    borderColor: 'white',
-    borderTopColor: 'white',
+  pulseCircle: {
+    position: 'absolute',
+    width: 180,
+    height: 180,
+    borderRadius: 100,
+    backgroundColor: '#FFFFFF',
+    opacity: 0.5,
   },
   content: {
     flex: 1,
@@ -124,11 +158,10 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     lineHeight: 22,
-    marginTop: 40,
+    marginTop: 100,
     marginBottom: 20,
     paddingHorizontal: 20,
-    position: 'relative',
-    fontFamily:'Inter-SemiBold'
+    fontFamily: 'Inter-SemiBold',
   },
   steps: {
     alignItems: 'flex-start',

@@ -1,15 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Text, View, Image, TouchableOpacity, StyleSheet, ActivityIndicator, GestureResponderEvent, Dimensions, Modal, ScrollView } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { router, Stack } from 'expo-router';
 import Checkbox from 'expo-checkbox';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
 export default function App() {
   const [modalVisible, setModalVisible] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [termsAlreadyAccepted, setTermsAlreadyAccepted] = useState(false);
+
+  // Check terms acceptance status when app loads
+  useEffect(() => {
+    checkTermsAcceptance();
+  }, []);
+
+  const checkTermsAcceptance = async () => {
+    try {
+      const termsAccepted = await AsyncStorage.getItem('termsAccepted');
+      if (termsAccepted === 'true') {
+        setTermsAlreadyAccepted(true);
+      }
+    } catch (error) {
+      console.error('Error checking terms acceptance:', error);
+    }
+  };
+
+  const handleGetStarted = () => {
+    if (termsAlreadyAccepted) {
+      // Skip modal and go directly to explore if terms were previously accepted
+      router.push('/explore');
+    } else {
+      // Show modal if terms haven't been accepted yet
+      setModalVisible(true);
+    }
+  };
+
+  const handleTermsAcceptance = async () => {
+    if (isChecked) {
+      try {
+        await AsyncStorage.setItem('termsAccepted', 'true');
+        setTermsAlreadyAccepted(true);
+        setModalVisible(false);
+        router.push('/explore');
+      } catch (error) {
+        console.error('Error storing terms acceptance:', error);
+      }
+    }
+  };
 
   // Custom Button Component
   const Button = ({
@@ -72,7 +113,7 @@ export default function App() {
 
           <Button
             title="Get Started"
-            handlePress={() => setModalVisible(true)}
+            handlePress={handleGetStarted}
           />
 
           <Modal
@@ -151,12 +192,7 @@ export default function App() {
                       styles.buttonContinue,
                       !isChecked && styles.buttonDisabled
                     ]}
-                    onPress={() => {
-                      if (isChecked) {
-                        setModalVisible(false);
-                        router.push('/explore');
-                      }
-                    }}
+                    onPress={handleTermsAcceptance}
                     disabled={!isChecked}
                   >
                     <Text style={styles.buttonTextContinue}>Continue</Text>
