@@ -38,6 +38,7 @@ export default function TabLayout() {
             marginTop: tabBarHeight * 0.1875, // 18.75% of tab bar height
           },
           headerShown: true,
+          headerTitle: 'Library', 
           headerStyle: {
             backgroundColor: '#5DB075',
           },
@@ -107,6 +108,7 @@ export default function TabLayout() {
             marginTop: tabBarHeight * 0.1875, // 18.75% of tab bar height
           },
           headerShown: true,
+          headerTitle: 'About Us', 
           headerStyle: {
             backgroundColor: '#5DB075',
           },

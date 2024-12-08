@@ -30,6 +30,8 @@ const SOP = () => {
           headerTintColor: '#fff',
           headerTitle: 'S.O.P.',
           headerTitleAlign: 'center',
+          headerLeft: () => null,
+          headerBackVisible: false,
         }}
       />
 

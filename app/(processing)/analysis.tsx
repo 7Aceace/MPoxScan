@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import Animated, { 
-  Easing, 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming, 
-  withRepeat 
-} from 'react-native-reanimated';
+import Animated, { Easing, useSharedValue, useAnimatedStyle, withTiming, withRepeat } from 'react-native-reanimated';
+import { useKeepAwake } from 'expo-keep-awake'; // Import KeepAwake
 
 // Add this type declaration
 declare global {
@@ -20,6 +15,7 @@ declare global {
 const { width } = Dimensions.get('window');
 
 const Analysis = () => {
+  useKeepAwake();
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const pulse = useSharedValue(1); // Controls the scale of the pulse
@@ -32,13 +28,16 @@ const Analysis = () => {
       if (global.analysisResults) {
         clearInterval(checkResults);
         setIsComplete(true);
-        router.push({
-          pathname: '/(results)/results',
-          params: {
-            prediction: global.analysisResults.prediction,
-            imageBase64: global.analysisResults.imageBase64,
-          },
-        });
+        // Use a timeout to ensure the component is fully mounted before navigating
+        setTimeout(() => {
+          router.push({
+            pathname: '/results',
+            params: {
+              prediction: global.analysisResults?.prediction,
+              imageBase64: global.analysisResults?.imageBase64,
+            },
+          });
+        }, 100); // Adjust timing as needed
         global.analysisResults = null;
       }
     }, 100);
@@ -112,6 +111,9 @@ const Analysis = () => {
         <Text style={styles.infoText}>
           Be informed that MPoxScan is a preliminary screening tool that uses machine learning. It is not a medical tool. Consult a physician after the result.
         </Text>
+        <Text style={styles.infoText2}>
+          Our models are running simulatenously on a free server. This make take a while. 
+        </Text>
         <View style={styles.steps}>
           {currentStep >= 1 && <Text style={styles.stepText}>✔ Patterns Identified</Text>}
           {currentStep >= 2 && <Text style={styles.stepText}>✔ Analysis Complete</Text>}
@@ -159,6 +161,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     marginTop: 100,
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    fontFamily: 'Inter-SemiBold',
+  },
+  infoText2: {
+    fontSize: 16,
+    color: 'white',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginTop: 20,
     marginBottom: 20,
     paddingHorizontal: 20,
     fontFamily: 'Inter-SemiBold',

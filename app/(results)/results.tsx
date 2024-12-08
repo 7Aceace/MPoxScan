@@ -12,6 +12,14 @@ const Results = () => {
   const imageBase64 = String(params.imageBase64 || '');
   const confidence = parseFloat(String(params.confidence)) || 0; // Get confidence from params
 
+  const [localPredictionKey, setLocalPredictionKey] = useState('');
+  const [localImageBase64, setLocalImageBase64] = useState('');
+
+  React.useEffect(() => {
+    // Store the data in local state when the component loads
+    setLocalPredictionKey(String(params.prediction || ''));
+    setLocalImageBase64(String(params.imageBase64 || ''));
+  }, [params]);
 
   // Memoize the data to prevent unnecessary recalculations
   const info = React.useMemo(() => (
@@ -31,8 +39,8 @@ const Results = () => {
         router.push({
           pathname: '/(results)/SOP',
           params: {
-            prediction: predictionKey,
-            imageBase64: imageBase64
+            prediction: localPredictionKey,
+            imageBase64: localImageBase64,
           }
         });
         setIsLoading(false);
@@ -52,7 +60,7 @@ const Results = () => {
           headerTitle: 'Results',
           headerTitleAlign: 'center',
           headerLeft: () => null,
-          headerBackVisible: true,
+          headerBackVisible: false,
         }}
       />
 

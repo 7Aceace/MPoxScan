@@ -8,10 +8,13 @@ import axios from 'axios';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';  // Add this new import
 import { MaterialIcons } from '@expo/vector-icons';  // Add this import
+import { useKeepAwake } from 'expo-keep-awake'; // Import KeepAwake
 
 const { width, height } = Dimensions.get('window');
 
 export default function ExploreScreen() {
+  useKeepAwake(); // Keep the screen awake
+
   const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +34,7 @@ export default function ExploreScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('YOUR_API_URL');
+        const response = await fetch('https://ace7s-mpoxscan.hf.space/ask');
         const result = await response.json();
         setData(result);
       } catch (error) {
