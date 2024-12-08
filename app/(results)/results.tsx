@@ -44,7 +44,7 @@ const Results = () => {
           }
         });
         setIsLoading(false);
-      }, 1000); // Adjust timing as needed
+      }, 500); // Adjust timing as needed
     }
   };
 
