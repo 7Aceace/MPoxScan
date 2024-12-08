@@ -211,7 +211,6 @@ export default function ExploreScreen() {
         </Animated.View>
       </View>
       
-      {isLoading && (() => router.push('/(processing)/analysis'))()}
     </SafeAreaView>
   );
 }
