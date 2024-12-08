@@ -16,6 +16,7 @@ export default function ExploreScreen() {
   const [image, setImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const scanLineAnimation = useRef(new Animated.Value(0)).current;
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     startScanAnimation();
@@ -26,6 +27,20 @@ export default function ExploreScreen() {
       router.replace('/(processing)/analysis');
     }
   }, [isLoading]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('YOUR_API_URL');
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const startScanAnimation = () => {
     Animated.loop(
@@ -46,12 +61,8 @@ export default function ExploreScreen() {
 
   const prepareImageForUpload = async (uri: string) => {
     setIsLoading(true);
-    
+  
     try {
-      // Navigate to analysis screen first
-      router.replace('/(processing)/analysis');
-
-      // Prepare and send the image
       const fileInfo = await FileSystem.getInfoAsync(uri);
       const formData = new FormData();
       formData.append('file', {
@@ -59,28 +70,35 @@ export default function ExploreScreen() {
         type: 'image/jpeg',
         name: 'upload.jpg',
       } as any);
-
+  
       const response = await axios.post('https://ace7s-mpoxscan.hf.space/ask', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
         timeout: 30000,
       });
-
+  
       if (response.status === 200 && response.data) {
-        global.analysisResults = {
-          prediction: response.data.prediction,
-          imageBase64: response.data.image,
-          confidence: response.data.confidence,
-        };
+        const { prediction, image, confidence } = response.data;
+  
+        // Navigate to Result.tsx with prediction, imageBase64, and confidence
+        router.push({
+          pathname: '/(results)/results', // Corrected pathname to match the expected format
+          params: {
+            prediction: prediction,
+            imageBase64: image, // Base64 encoded image
+            confidence: confidence, // Convert confidence to string
+          },
+        });
       } else {
         throw new Error('Invalid response from server');
       }
-
     } catch (error) {
       console.error('Error:', error);
       Alert.alert('Error', 'Failed to process image');
       router.back();
+    } finally {
+      setIsLoading(false);
     }
   };
 

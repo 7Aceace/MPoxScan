@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator, Modal, BlurView } from 'react-native';
+import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator} from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { diseaseInformation } from './diseaseInfo';
 
@@ -10,6 +10,8 @@ const Results = () => {
   
   const predictionKey = String(params.prediction || '');
   const imageBase64 = String(params.imageBase64 || '');
+  const confidence = parseFloat(String(params.confidence)) || 0; // Get confidence from params
+
 
   // Memoize the data to prevent unnecessary recalculations
   const info = React.useMemo(() => (
@@ -75,9 +77,9 @@ const Results = () => {
           </View>
 
           <View style={styles.confidenceBox}>
-            <Text style={styles.confidenceText}>
-              Confidence Rate: {(0.95 * 100).toFixed(1)}%
-            </Text>
+          <Text style={styles.confidenceText}>
+          Confidence Rate: {confidence.toFixed(2)}% {/* Display confidence */}
+         </Text>
           </View>
         </View>
       </View>

@@ -75,7 +75,7 @@ const SOP = () => {
 
           <TouchableOpacity 
             style={[styles.button, styles.mainMenuButton]}
-            onPress={() => router.push('/explore')}
+            onPress={() => router.push('/(tabs)/explore')}
           >
             <Text style={styles.mainMenuText}>Main Menu</Text>
           </TouchableOpacity>
