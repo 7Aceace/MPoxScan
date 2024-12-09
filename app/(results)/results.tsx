@@ -22,30 +22,33 @@ const Results = () => {
   }, [params]);
 
   // Memoize the data to prevent unnecessary recalculations
-  const info = React.useMemo(() => (
-    diseaseInformation[predictionKey] || {
+  const info = React.useMemo(() => {
+    if (confidence < 60) {
+      return {
+        description: 'Model has a very low confidence rate on classifying the uploaded image. Please proceed to the MainMenu to rescan.',
+        keyPoints: [],
+        severity: 'Low'
+      };
+    }
+    return diseaseInformation[predictionKey] || {
       description: 'Information not available',
       keyPoints: [],
       severity: 'Low'
-    }
-  ), [predictionKey]);
+    };
+  }, [predictionKey, confidence]);
 
-  const handleSOPNavigation = async () => {
-    setIsLoading(true);
-    if (predictionKey === 'Healthy') {
-      router.push('/explore');
-    } else {
-      setTimeout(() => {
-        router.push({
-          pathname: '/(results)/SOP',
-          params: {
-            prediction: localPredictionKey,
-            imageBase64: localImageBase64,
-          }
-        });
-        setIsLoading(false);
-      }, 500); // Adjust timing as needed
-    }
+  const handleMainMenuNavigation = () => {
+    router.push('/explore');
+  };
+
+  const handleSOPNavigation = () => {
+    router.push({
+      pathname: '/(results)/SOP',
+      params: {
+        prediction: localPredictionKey,
+        imageBase64: localImageBase64,
+      }
+    });
   };
 
   return (
@@ -81,13 +84,15 @@ const Results = () => {
 
         <View style={styles.resultsContainer}>
           <View style={styles.predictionBox}>
-            <Text style={styles.predictionText}>{predictionKey || 'No prediction available'}</Text>
+            <Text style={styles.predictionText}>
+              {confidence < 60 ? 'No prediction available' : predictionKey}
+            </Text>
           </View>
 
           <View style={styles.confidenceBox}>
-          <Text style={styles.confidenceText}>
-          Confidence Rate: {confidence.toFixed(2)}% {/* Display confidence */}
-         </Text>
+            <Text style={styles.confidenceText}>
+              Confidence: {confidence < 60 ? 'Invalid' : `${confidence.toFixed(2)}%`}
+            </Text>
           </View>
         </View>
       </View>
@@ -103,16 +108,27 @@ const Results = () => {
         <Text style={styles.infoHeader}>Key Information</Text>
         <Text style={styles.infoText}>{info.description}</Text>
 
-        <TouchableOpacity 
-          style={styles.sopButton}
-          onPress={handleSOPNavigation}
-          activeOpacity={0.8}
-          delayPressIn={0}
-        >
-          <Text style={styles.sopButtonText}>
-            {predictionKey === 'Healthy' ? 'Main Menu' : 'Standard Operating Procedures'}
-          </Text>
-        </TouchableOpacity>
+        {confidence < 60 && (
+          <TouchableOpacity
+            style={styles.sopButton}
+            onPress={handleMainMenuNavigation}
+            activeOpacity={0.8}
+            delayPressIn={0}
+          >
+            <Text style={styles.sopButtonText}>Main Menu</Text>
+          </TouchableOpacity>
+        )}
+
+        {confidence >= 60 && (
+          <TouchableOpacity
+            style={styles.sopButton}
+            onPress={handleSOPNavigation}
+            activeOpacity={0.8}
+            delayPressIn={0}
+          >
+            <Text style={styles.sopButtonText}>Standard Operating Procedures</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       {/* Loading Overlay */}
